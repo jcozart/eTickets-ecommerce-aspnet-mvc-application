@@ -1,4 +1,4 @@
-﻿using eTickets.Data.Services;
+﻿using eTickets.Data.Services.ActorsService;
 using eTickets.Models;
 using Microsoft.AspNetCore.Mvc;
 

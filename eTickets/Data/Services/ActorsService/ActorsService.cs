@@ -2,7 +2,7 @@
 using eTickets.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace eTickets.Data.Services
+namespace eTickets.Data.Services.ActorsService
 {
     public class ActorsService : EntityBaseRepository<Actor>, IActorsService
     {
