@@ -60,24 +60,52 @@ namespace eTickets.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            var movieDetails = await _moviesService.GetByIdAsync(id);
-            if (movieDetails == null)
+            var movieDetails = await _moviesService.GetMovieByIdAsync(id);
+            if (movieDetails == null) return View("NotFound");
+
+            var response = new NewMovieVM()
             {
-                return View("NotFound");
-            }
-            return View(movieDetails);
+                Id = movieDetails.Id,
+                Name = movieDetails.Name,
+                Description = movieDetails.Description,
+                Price = movieDetails.Price,
+                StartDate = movieDetails.StartDate,
+                EndDate = movieDetails.EndDate,
+                ImageURL = movieDetails.ImageURL,
+                MovieCategory = movieDetails.MovieCategory,
+                CinemaId = movieDetails.CinemaId,
+                ProducerId = movieDetails.ProducerId,
+                ActorIds = movieDetails.Actors_Movies.Select(n => n.ActorId).ToList(),
+            };
+
+            var movieDropdownsData = await _moviesService.GetNewMovieDropdownsValues();
+            ViewBag.Cinemas = new SelectList(movieDropdownsData.Cinemas, "Id", "Name");
+            ViewBag.Producers = new SelectList(movieDropdownsData.Producers, "Id", "FullName");
+            ViewBag.Actors = new SelectList(movieDropdownsData.Actors, "Id", "FullName");
+
+            return View(response);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,ImageURL,StartDate,EndDate,MovieCategory,Cinema,Producer")] Movie movie)
+        public async Task<IActionResult> Edit(int id, NewMovieVM movie)
         {
+            if (id != movie.Id) return View("NotFound");
+
             if (!ModelState.IsValid)
             {
+                var movieDropdownsData = await _moviesService.GetNewMovieDropdownsValues();
+
+                ViewBag.Cinemas = new SelectList(movieDropdownsData.Cinemas, "Id", "Name");
+                ViewBag.Producers = new SelectList(movieDropdownsData.Producers, "Id", "FullName");
+                ViewBag.Actors = new SelectList(movieDropdownsData.Actors, "Id", "FullName");
+
                 return View(movie);
             }
-            await _moviesService.UpdateAsync(id, movie);
+
+            await _moviesService.UpdateMovieAsync(movie);
             return RedirectToAction(nameof(Index));
         }
+
 
         public async Task<IActionResult> Delete(int id)
         {
